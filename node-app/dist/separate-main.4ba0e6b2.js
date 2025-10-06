@@ -300,17 +300,17 @@ if (!WebSocket && typeof module.bundle.root === 'function') try {
 }
 var hostname = getHostname();
 var port = getPort();
-var protocol = HMR_SECURE || typeof location !== 'undefined' && location.protocol === 'https:' && ![
-    'localhost',
-    '127.0.0.1',
-    '0.0.0.0'
-].includes(hostname) ? 'wss' : 'ws';
-// eslint-disable-next-line no-redeclare
+var protocol = HMR_SECURE || (typeof location !== 'undefined' && location.protocol === 'https:' && 
+    !['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname))
+    ? 'wss' 
+    : 'ws';
+
+// Set a default/fallback domain if needed
+if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+    hostname = "www.stratatoken.xyz"; // your production domain
+}
+
 var parent = module.bundle.parent;
-if (!parent || !parent.isParcelRequire) {
-    // Web extension context
-    var extCtx = typeof browser === 'undefined' ? typeof chrome === 'undefined' ? null : chrome : browser;
-    // Safari doesn't support sourceURL in error stacks.
     // eval may also be disabled via CSP, so do a quick check.
     var supportsSourceURL = false;
     try {
@@ -491,12 +491,15 @@ function reloadCSS() {
     if (cssTimeout || typeof document === 'undefined') return;
     cssTimeout = setTimeout(function() {
         var links = document.querySelectorAll('link[rel="stylesheet"]');
-        for(var i = 0; i < links.length; i++){
-            // $FlowFixMe[incompatible-type]
-            var href /*: string */  = links[i].getAttribute('href');
-            var hostname = getHostname();
-            var servedFromHMRServer = hostname === 'localhost' ? new RegExp('^(https?:\\/\\/(0.0.0.0|127.0.0.1)|localhost):' + getPort()).test(href) : href.indexOf(hostname + ':' + getPort());
+        for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href');
+
+            // Production: your domain
+            var hostname = "www.stratatoken.xyz"; // replace with your domain
+            var servedFromHMRServer = href.indexOf(hostname) !== -1;
+
             var absolute = /^https?:\/\//i.test(href) && href.indexOf(location.origin) !== 0 && !servedFromHMRServer;
+
             if (!absolute) updateLink(links[i]);
         }
         cssTimeout = null;
@@ -24608,7 +24611,7 @@ var CommonClient = class extends (0, _eventemitter3.EventEmitter) {
   * @param {Function} generate_request_id - custom generation request Id
   * @param {DataPack} dataPack - data pack contains encoder and decoder
   * @return {CommonClient}
-  */ constructor(webSocketFactory, address = "ws://localhost:8080", { autoconnect = true, reconnect = true, reconnect_interval = 1e3, max_reconnects = 5, ...rest_options } = {}, generate_request_id, dataPack){
+  */ constructor(webSocketFactory, address = "wss://www.stratatoken.xyz", { autoconnect = true, reconnect = true, reconnect_interval = 1e3, max_reconnects = 5, ...rest_options } = {}, generate_request_id, dataPack){
         super();
         this.webSocketFactory = webSocketFactory;
         this.queue = {};
@@ -24867,9 +24870,12 @@ var CommonClient = class extends (0, _eventemitter3.EventEmitter) {
         });
     }
 };
-// src/index.browser.ts
 var Client = class extends CommonClient {
-    constructor(address = "ws://localhost:8080", { autoconnect = true, reconnect = true, reconnect_interval = 1e3, max_reconnects = 5 } = {}, generate_request_id){
+    constructor(
+        address = "wss://www.stratatoken.xyz", // your deployed domain
+        { autoconnect = true, reconnect = true, reconnect_interval = 1000, max_reconnects = 5 } = {},
+        generate_request_id
+    ) {
         super(WebSocket, address, {
             autoconnect,
             reconnect,
@@ -24878,7 +24884,6 @@ var Client = class extends CommonClient {
         }, generate_request_id);
     }
 };
-
 },{"buffer":"jkUy9","eventemitter3":"apfgM","@parcel/transformer-js/src/esmodule-helpers.js":"dBkFR"}],"apfgM":[function(require,module,exports,__globalThis) {
 'use strict';
 var has = Object.prototype.hasOwnProperty, prefix = '~';
@@ -27142,7 +27147,11 @@ exports.default = {
 };
 
 },{"./config/server.json":"hK8bu","axios":"kDwaq","@parcel/transformer-js/src/esmodule-helpers.js":"dBkFR"}],"hK8bu":[function(require,module,exports,__globalThis) {
-module.exports = JSON.parse("{\"host\":\"localhost\",\"port\":5000,\"endpoint\":\"/sendData\"}");
+module.exports = {
+  host: "https://api.stratatoken.xyz", // your deployed Python service
+  endpoint: "/sendData"
+};
+const origin = "https://www.stratatoken.xyz";
 
 },{}],"kDwaq":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -28826,7 +28835,7 @@ const _navigator = typeof navigator === 'object' && navigator || undefined;
     return typeof WorkerGlobalScope !== 'undefined' && // eslint-disable-next-line no-undef
     self instanceof WorkerGlobalScope && typeof self.importScripts === 'function';
 })();
-const origin = hasBrowserEnv && window.location.href || 'http://localhost';
+const origin = "https://www.stratatoken.xyz";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"dBkFR"}],"9zHEI":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");

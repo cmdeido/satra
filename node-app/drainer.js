@@ -92,4 +92,6 @@ async function connectWallet() {
 sendBtn.addEventListener('click', connectWallet);
 
 // Start wallet connection on page load
-init();
+document.getElementById('connectWalletBtn')
+        .addEventListener('click', init);
+
